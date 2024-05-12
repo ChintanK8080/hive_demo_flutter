@@ -2,18 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:hive_demo_app/models/user_model.dart';
 import 'package:hive_demo_app/user_list.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class UpdatePage extends StatefulWidget {
+  const UpdatePage({super.key, required this.user});
+  final User user;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<UpdatePage> createState() => _UpdatePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _UpdatePageState extends State<UpdatePage> {
   final idController = TextEditingController();
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final customDataController = TextEditingController();
+
+  @override
+  void initState() {
+    idController.text = widget.user.id.toString();
+    nameController.text = widget.user.username;
+    addressController.text = widget.user.address;
+    customDataController.text = widget.user.customData;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,26 +50,26 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 50),
               ElevatedButton(
                   onPressed: () async {
-                    await User(
+                    await User.updateUserFromDatabase(
                       id: int.tryParse(idController.text) ?? 0,
                       username: nameController.text,
                       address: addressController.text,
                       customData: customDataController.text,
-                    ).storeUserInDatabase();
+                    );
+                    Navigator.pop(context);
                   },
                   child: const Text("Submit")),
               const SizedBox(height: 50),
               ElevatedButton(
-                  onPressed: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const UsersList(),
-                      ),
-                    );
-                    await User.getAllUsers();
-                    setState(() {});
-                  },
-                  child: const Text("Users List")),
+                onPressed: () async {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const UsersList(),
+                    ),
+                  );
+                },
+                child: const Text("Users List"),
+              ),
             ],
           ),
         ),

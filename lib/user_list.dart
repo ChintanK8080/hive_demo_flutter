@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_demo_app/models/user_model.dart';
+import 'package:hive_demo_app/update_page.dart';
 
 class UsersList extends StatefulWidget {
   const UsersList({super.key});
@@ -11,8 +12,13 @@ class UsersList extends StatefulWidget {
 class _UsersListState extends State<UsersList> {
   @override
   void initState() {
-    User.getAllUsers();
+    initialSetup();
     super.initState();
+  }
+
+  initialSetup() async {
+    await User.getAllUsers();
+    setState(() {});
   }
 
   @override
@@ -20,7 +26,19 @@ class _UsersListState extends State<UsersList> {
     return Scaffold(
       body: ListView.separated(
         itemCount: User.listOfUser.length,
-        itemBuilder: (context, index) => UserTile(user: User.listOfUser[index]),
+        itemBuilder: (context, index) => UserTile(
+          user: User.listOfUser[index],
+          onTap: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => UpdatePage(
+                  user: User.listOfUser[index],
+                ),
+              ),
+            );
+            setState(() {});
+          },
+        ),
         separatorBuilder: (context, index) => const Divider(),
       ),
     );
@@ -28,23 +46,31 @@ class _UsersListState extends State<UsersList> {
 }
 
 class UserTile extends StatelessWidget {
-  const UserTile({super.key, required this.user});
+  const UserTile({super.key, required this.user, required this.onTap});
   final User user;
+  final Function() onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Id :- ${user.id}"),
-          const SizedBox(height: 10),
-          Text("Name :- ${user.username}"),
-          const SizedBox(height: 10),
-          Text("Address :- ${user.address}"),
-          const SizedBox(height: 10),
-          Text("customData :- ${user.customData}"),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Id :- ${user.id}"),
+              const SizedBox(height: 10),
+              Text("Name :- ${user.username}"),
+              const SizedBox(height: 10),
+              Text("Address :- ${user.address}"),
+              const SizedBox(height: 10),
+              Text("customData :- ${user.customData}"),
+            ],
+          ),
+          GestureDetector(onTap: onTap, child: Icon(Icons.edit))
         ],
       ),
     );

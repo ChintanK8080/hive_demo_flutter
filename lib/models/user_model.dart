@@ -22,7 +22,7 @@ class User<T> {
       id: json['id'] as int,
       username: json['username'] as String,
       address: json['address'] as String,
-      customData: json['customData'], // Assuming customData can be of any type
+      customData: json['customData'],
     );
   }
 
@@ -45,20 +45,41 @@ class User<T> {
     await box.put(username, toEncodedString());
   }
 
-  static Future<User?> getUserFromDatabase(String username) async {
+  static Future<void> updateUserFromDatabase({
+    int? id,
+    required String username,
+    String? address,
+    String? customData,
+  }) async {
     var box = await Hive.openBox('UsersBox');
     final encodedUser = await box.get(username);
     if (encodedUser != null && encodedUser.runtimeType == String) {
-      return jsonDecode(encodedUser);
+      final collectedUser = User.fromJson(jsonDecode(encodedUser));
+      await User(
+              username: username,
+              id: id ?? collectedUser.id,
+              address: address ?? collectedUser.address,
+              customData: customData ?? collectedUser.customData)
+          .storeUserInDatabase();
     }
-    return null;
+  }
+
+  static Future<void> deleteUserFromDatabase({
+    required String username,
+  }) async {
+    var box = await Hive.openBox('UsersBox');
+    await box.delete(username);
   }
 
   static Future<void> getAllUsers() async {
     Box<dynamic> box = await Hive.openBox("UsersBox");
     List<User> temporaryList = [];
     for (var i in box.values) {
-      temporaryList.add(User.fromJson(jsonDecode(i)));
+      temporaryList.add(
+        User.fromJson(
+          jsonDecode(i),
+        ),
+      );
     }
     listOfUser = temporaryList;
   }

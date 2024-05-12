@@ -9,16 +9,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
   cupertino_icons: ^1.0.6
-  hive_multiisolate: ^1.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.9
 
   flutter_lints: ^3.0.0
-  build_runner: ^2.4.9
+
 
 flutter:
 

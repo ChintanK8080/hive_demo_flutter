@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive_demo_app/models/user_model.dart';
+import 'package:hive_demo_app/user_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,7 +37,26 @@ class _HomePageState extends State<HomePage> {
               const Text("Custom Data"),
               TextField(controller: customDataController),
               const SizedBox(height: 50),
-              ElevatedButton(onPressed: () {}, child: const Text("Click Me")),
+              ElevatedButton(
+                  onPressed: () async {
+                    await User(
+                      id: int.tryParse(idController.text) ?? 0,
+                      username: nameController.text,
+                      address: addressController.text,
+                      customData: customDataController.text,
+                    ).storeUserInDatabase();
+                  },
+                  child: const Text("Submit")),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const UsersList(),
+                      ),
+                    );
+                  },
+                  child: const Text("Users List")),
             ],
           ),
         ),
